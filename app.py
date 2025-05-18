@@ -91,24 +91,29 @@ def handle_message(event):
             sell = table[user_msg]["sell"]
             bot_msg = TextMessage(text=f"{user_msg}\n 買價{buy}元\n ,賣價{sell}元\n  資料來源:台灣銀行匯率報告")
         else:
-              completion = client.chat.completions.create(
+            completion = client.chat.completions.create(
               model="gpt-4.1",
               messages=[
-                  {},
-           {
-            "role": "user",
-            "content": user_msg
-          }
-          ]
-         )
+                  {
+                      "role": "system",
+                      "content": """
+                        本AI模型為一個先進的語言生成系統，能夠理解並回應使用者以繁體中文提出的各種問題。它具備自然語言理解與生成能力，能協助解答知識性問題、提供生活建議、協助學習、撰寫文章、翻譯、以及進行多輪對話。請以禮貌、簡潔且清楚的方式回應使用者，並盡量以繁體中文作答。如遇無法回答的問題，請誠實告知並建議使用者尋求其他資源協助。
+                        """
+                  },
+                    {
+                    "role": "user",
+                    "content": user_msg
+                    }
+                ]
+            )
 
-        print(completion.choices[0].message.content)
-        # 取得openai回應的文字
-        ai_msg = completion.choices[0].message.content
-        # 將文字放入textmessenage包裝成可回傳Line service的文字的訊息
-        bot_msg = TextMessage(text=ai_msg)
+            print(completion.choices[0].message.content)
+            # 取得openai回應的文字
+            ai_msg = completion.choices[0].message.content
+            # 將文字放入textmessenage包裝成可回傳Line service的文字的訊息
+            bot_msg = TextMessage(text=ai_msg)
 
-    line_bot_api.reply_message_with_http_info(
+        line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
                 # 放置於 ReplyMessageRequest 的 messages 裡的物件即是要回傳給使用者的訊息
